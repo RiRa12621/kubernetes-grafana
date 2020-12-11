@@ -7,6 +7,10 @@ local graphPanel = grafana.graphPanel;
 
 local grafana = import 'grafana/grafana.libsonnet';
 
+
+#Import example panel
+local exampelPanel = import 'panels/exampe/example1.libsonnet'
+
 local grafanaWithDashboards =
   (grafana
    {
@@ -14,6 +18,7 @@ local grafanaWithDashboards =
        namespace: 'monitoring-grafana',
        grafana+:: {
          dashboards+:: {
+           // Dashboard definition
            'my-dashboard.json':
              dashboard.new('My Dashboard')
              .addTemplate(
@@ -35,8 +40,14 @@ local grafanaWithDashboards =
              .addRow(
                row.new()
                .addPanel(
+	       # Regular Panel definition
                  graphPanel.new('My Panel', span=6, datasource='$datasource')
                  .addTarget(prometheus.target('vector(1)')),
+	       # Imported query from file
+	       	 graphPanel.new('My Panel', span=6, datasource='$datasource')
+		 .addTarget(prometheus.target(importstr 'panels/exampe/examplequery1.txt')),
+	       # Imported from libsonnet
+	         examplePanel,
                )
              ),
          },
